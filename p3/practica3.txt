@@ -1,0 +1,34 @@
+Autores: Sergio Herrero 698521
+	     Alex Oarga Hategan 718123
+
+Explicación:
+Para hacer el script mas robusto, lo primero es comprobar si el número
+de parámetros es correcto.
+También se debe de comprobar, si el fichero pasado por parámetro, existe
+y es un fichero común.
+Una vez comprobado todo, se comprueba que elección ha escogido el usuario.
+Si es la opción de añadir:
+Se cambia el IFS para que los caracteres separadores sean ":" y con un
+bucle while, vamos leyendo el fichero. En las variables name y passwd se
+van almacenando los nombres y passwords de los usuarios a añadir.
+Mediante el comando useradd se les añade al sistema, y se eligen las opciones:
+-m para que cree el directorio home
+-U para que cree el el grupo principal y se añada
+-k para que incluya los ficheros de /etc/skel
+-K para establecer el rango de los UID
+Por ultimo, por la entrada estandar de chpasswd se le pasa el nombre y la pass
+con el formato user:pass
+
+Para la opcion eliminar:
+Mediante el comando cat "$RUTA" (siendo $RUTA el fichero que se pasa por parámetro) se muestra el contenido del fichero. La salida se redirecciona al comando cut, que con la opción -f1 corta la primera columna de la entrada y con -d: indica que el separador de columnas es el caracter ':', de esta forma, la salida contiene el nombre de usuario e ignora la contraseña si la hay. Esta salida a su vez, se redirecciona al bucle while que itera linea por linea del fichero de nombres.
+Por cada nombre de usuario:
+Para no hacer un backup vacio y no eliminar un usuario que no existe se utiliza if y se comprueba la condición de si un string no tiene una longitud mayor que 0 (-z). Como string se utilizará la búsqueda del nombre del usuario (con el comando grep) en el fichero passwd.
+El comando usermod se utilizá para inhabilitar la cuenta. La opción -L hace que usermod coloque el caracter '!' delante de la contraseña del usuario.
+Para hacer el backup se usa tar con los siguientes comandos:
+-c crea un nuevo archivo
+-f escribe en el fichero indicado (en este caso backup-nombreUsuario.tar)
+-C por cuestion de seguridad tar muestra una advertencia cuando se utilizan rutas absolutas. Para sortearlo se utiliza la opción para situarse en el directorio raiz (-C /) y poder utilizar la ruta relativa home/nombreUsuario
+El comando userdel elimina el usuario y con la opción -r elimina su directorio en home y su mail spool.
+
+
+

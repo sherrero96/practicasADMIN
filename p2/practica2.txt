@@ -1,0 +1,83 @@
+Autores:
+	Sergio Herrero Barco 698521
+	Alexandru Oarga Hategan 718123
+Scripts:
+1)practica2_1.sh: Lo primero que se debe realizar es buscar la ruta del nombre
+del fichero. Para ello se usa el comando find. Como el nombre del fichero puede
+tener espacios en blanco, la variable va entre comillas dobles, para que lo
+interprete como una cadena y asi poder usar espacios en blanco. Si no
+encuentra ningÃºn fichero, la longitud de la cadena sera 0 por lo que se
+compara si es mayor que 0 y asÃ­ asegurarse de que al menos ha encontrado una
+ruta; si no es asÃ­, se acaba el script con un estado 1 (ERROR).
+Se comprueba mediante el comando test si es legible, modificable y ejecutable.
+Si se ejecuta con comando source, se ejecuta en el propio shell, es un sinonimo
+de ejecutarlo con ./
+La ejecucion directa se hace desde el mismo shell en el que esta.
+Si se ejecuta con el comando bash, el shell actual crea un shell hijo
+que es el que ejecuta el script. Cuando acaba, se muere y el padre
+ve el estado de salida de su hijo.
+
+2)practica2_2.sh: Con un bucle for se itera sobre los parámetros. Se utiliza
+"$@" porque "$*" junta todos los parámetros en una sola cadena (no es posible
+distinguir los nombres con espacios) y $@ (=$*) separa los parámetros por
+espacios. "$@" separa los parametros pero no separa los nombres de parámetros,
+por lo que se pueden incluir espacios en el nombre. Por cada parámetro, se
+evalua con test si se trata de un fichero que se puede leer (parametro -r) y
+con el if, en caso de que se pueda leer, se abre con el comando less. Tanto en
+test como en less la variable se encuentra entre comillas dobles para no
+considerar los nombres con espacios como ficheros individuales. Para evaluar
+que funciona con ficheros con espacios se hace la prueba:
+$> bash practica2_2.sh file1 file2 "fichero con espacios"
+Si file1 file2 y fichero con espacios contienen algo se mostrara su contenido
+en orden.
+
+3)practica2_3.sh: Se debe realizar una bÃºsqueda de la ruta donde se encuentra
+el fichero dado por el usuario, y para ello se usa el comando find. Como el
+nombre puede tener espacios en blanco, la variable va entre comillas dobles 
+para que sea interpretado como una cadena. Si no es encontrado ningÃºn fichero
+la longitud de la cadena sera 0, por lo que si es asi, se acaba el script y
+se sale del script con estado 1 (ERROR); si no, significa que al menos ha
+encontrado una ruta.
+Se comprueba si el fichero es un archivo comÃºn, y si lo es, se le cambia
+los modos de sus permisos, aÃ±adiendo la posibilidad de ejecucion al usuario
+y al grupo con el comando chmod.
+Se termina mostrando los modos de permiso actualizados con el comando
+ls y egrep para mostrar solo el modo del archivo seleccionado.
+
+4)practica2_4.sh: primero se pide al usuario que introduzca un caracter, con
+echo y el parametro -n para seguir escribiendo en la misma linea. Con read -N
+1 var, se lee solo un parámetro de la entrada estandar y se almacena en var.
+A continuación, con case $var, se evalua el contenido de var con expresiones
+regulares. Si esta entre la a y la z mayúsculas y minúsculas [a-z][A-Z], se
+indica que se trata de una letra; entre 0 y 9 ([0-9]) se trata de un número y
+en los demás casos (defecto: *) de que se trata de un caracter especial.
+
+5)practica2_5.sh: Primero se hace una bÃºsqueda de los directorios que hay en
+la ruta dada. Para ello se usa el comando ls con la opcion -F, que lista
+todos los directorios y ficheros aÃ±adiendo un caracter / al final si es un
+directorio, y un * al final si es un fichero ejecutable. Con el comando
+egrep, se centra solo en los directorios, que terminan con el caracter /.
+Para poder contarlos, se cambia la variable IFS para que el caracter
+separador sea el caracter /. Se cuenta con el comando wc cuantas lineas hay, y
+se muestra por la terminal cuantos directorios hay y como se llaman.
+Para los ficheros es exactamente igual, solo que los ficheros, son todos
+aquellos que no terminan en /. La variable IFS se vuelve a cambiar para que
+ahora el caracter separador sea el caracter ' '. Despues de contar cuantos
+y listarlos, se restablece la variable IFS al valor que tenia antes de empezar
+el script.
+
+6)practica2_6.sh: Primero, con if y con test comprueba si existe el directorio
+$HOME/bin (con el parámetro -d en test). En caso de no existir crea el
+directorio con el comando mkdir. A continuación se procede a operar con los
+ficheros. Con el comando ls -F se listan los elementos del directorio y con el
+parámetro -F se añade la barra '/' al final de los directorios en la salida.
+Esta salida se redirecciona con una pipe al comando grep, que con el parámetro
+-v elimina las lineas que contienen un valor indicado, en este caso el nombre
+del script ($0) para que no lo mueva a bin. Este resultado a su vez es
+redireccionado a otro comando grep -v que se encarga de eliminar las lineas
+que coinciden con la expresión regular */, es decir, los elementos acabados en
+'/' (los directorios). Esta salida se redirige al comando while read. read lee
+linea por linea de la entrada que le pasamos y while por cada linea leida
+ejecuta las instrucciones del bucle. En el bucle se ejecuta el comando mv con
+la variable entre comillas dobles para que no lea los ficheros con espacios
+como ficheros individuales. Finalmente muestra información en cada iteración.

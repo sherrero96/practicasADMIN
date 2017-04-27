@@ -1,0 +1,75 @@
+Autores: Sergio Herrero Barco  698521
+	 Alex Oarga Hategan    718123
+
+----------PARTE 2-----------------------------------------------------------
+PUNTO1
+Para instalar sudo en root instalar el paquete con el comando:
+apt-get install sudo
+
+Para que user pueda ejecutar root sin password ejecutamos visudo y a�adimos la
+linea siguiente debajo de la linea "%sudo ALL=(ALL:ALL) ALL":
+
+user ALL=NOPASSWD: ALL
+
+PUNTO2
+Para las dos maquinas y el host modificar /etc/network/interfaces:
+auto eth1
+iface eth1 inet static
+	address 192.168.56.2  //para cada maquina una ip diferente
+	netmask 255.255.255.0
+	network 192.168.56.1
+	broadcast 192.168.56.255
+
+auto eth0
+iface eth0 inet dhcp
+
+Escribir para reinciar:
+service networking restart
+ifup eth1
+
+PUNTO3
+En debian-as1:
+ping 192.168.56.3	//otra maquina
+ping 192.168.56.10	// host
+
+En host:
+ping 192.168.56.2	//maquina1
+ping 192.168.56.3	//maquina2
+
+Observamos que se reciben los paquetes enviados.
+
+PUNTO 4
+Instalar el paquete openssh
+sudo apt-get install openssh-server
+
+PUNTO 5
+Modificar en /etc/ssh/sshd_config la siguiente linea para no permitir el login
+como root:
+PermitRootLogin no
+
+PUNTO 6
+Escribimos en el host un comando por ejemplo:
+ssh user@192.168.56.2 echo "mensaje";
+----------PARTE 3-----------------------------------------------------------
+En el host escribimos para generar la clave publica:
+ssh-keygen
+
+Escribimos para enviar la clave publica
+ssh-copy-id user@192.168.56.2 //maquina1
+ssh-copy-id user@192.168.56.3 //maquina2
+
+----------PARTE 4------------------------------------------------------------
+En el script se han hecho unas ligeras modificaciones. Para ello, 
+se han cambiado el numero de parametros a 3, la opcion, el fichero de usuarios
+y el fichero de ips. Si la opcion elegida es añadir un usuario, lo primero
+que se hace como en el anterior script es cambiar el ifs por el separador :
+Seguidamente, se lee el fichero de ips linea por linea y se le asigna a la
+variable IP. Por cada IP se le añade el usuario con su contraseña.
+El código de añadir al usuario solo cambia en que el comando useradd se hace
+a traves del ssh y con la opcion sudo. Se supone que cada maquina tiene un
+usuario llamado user. Por lo demas, es todo igual al anterior script.
+Si la opcion elegida es eliminar usuarios se vuelve a cambiar el ifs, como en
+el anterior script. Seguidamente se lee fichero de ips linea por linea
+y se va asignando cada ip a la variable IP. El codigo de eliminar usuarios
+solo cambia en que el comando userdel se hace atraves del ssh y con la opcion
+sudo.
