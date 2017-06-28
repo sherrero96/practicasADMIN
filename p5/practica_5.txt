@@ -1,0 +1,66 @@
+Autores: Sergio Herrero 698521
+		 Alex Oarga Hategan 718123
+
+=========================================================
+	PARTE 1
+=========================================================
+EN DEBIAN1:
+
+CREAR PARTICION 1
+	fdisk /dev/sdb
+	n
+	p
+	1 
+	2048
+	15000
+	w
+
+AÑADIR DOS PARTICIONES
+	mkfs -t ext4 /dev/sdb1
+	mkfs -t ext3 /dev/sdb2
+
+DIRECTORIOS DONDE MONTAR
+	mkdir part1
+	mkdir part2
+
+MONTAR
+	mount -t ext3 /dev/sdb2 /part2
+	mount -t ext4 /dev/sdb1 /part1
+
+COMPROBAR
+	more /etc/mtab
+
+=========================================================
+	PARTE 3
+=========================================================
+
+Partimos de un disco duro nuevo,  /dev/sda
+
+Usamos fdisk /dev/sda para administrar una particion
+Una vez dentro, presianamos
+n : Para crear una nueva particion
+p : Para crear una particion primaria
+1 : Crear como la primera particion del disco
+2048: Valores por defecto
+15000: Valores por defecto
+
+Una vez finalizado, se pulsa "t" para cambiar el identificador
+de una particion
+Para cambiarlo al tipo Linux LVM, se introduce el codigo "8e"
+
+Finalmente se guarda pulsando "w"
+
+Si se hace un fdisk -l del nuevo disco, se ve como se utiliza LVM
+
+=========================================================
+	PARTE 3 - PRUEBAS
+=========================================================
+INSTALAR LVM
+	sudo apt-get install lvm2
+
+CREAR PARTICIÓN NUEVO DISCO
+	fdisk /dev/sdc
+	mkfs /dev/sdc1
+
+CREAR GRUPO VOLUMEN
+	vgcreate gv1 /dev/sdc1

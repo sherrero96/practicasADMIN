@@ -1,0 +1,65 @@
+Autores: Sergio Herrero Barco 698521
+         Alex Oarga Hategan 718123
+
+-------------------------------------
+	     Parte 1
+-------------------------------------
+Se debe configurar las dos maquinas, tanto la que envia como
+la que recibe
+
+Maquina que envia los datos (192.168.56.3):
+Abrimos el archivo rsyslog que se encuentra en /etc/rsyslog.conf
+y se añade al final del archivo la siguiente linea:
+local0.info @@192.168.56.2:514
+el local0 significa el tipo de programa, el info la prioridad del
+mensaje, los @@ que se usara el protocolo TCP, la direccion ip, la
+de la maquina destino a la que enviar y 514 el puerto que usa
+rsyslog.conf
+Se reinicia el servicio de logs: service rsyslog restart
+
+Maquina que recibe los datos (192.168.56.2):
+Se abre el rsyslog que se encuentra en /etc/rsyslog.conf
+Se buscan las lineas
+
+#$ModLoad imtcp
+#$InputTCPServerRun 514
+y se quitan los comentarios.
+
+Al final del fichero rsyslog.conf se añade la siguiente linea:
+local0.info /var/log/monitorizacion.log
+Asi se establece donde se escribira los datos que lleguen.
+Se reinicia el servicio: service rsyslog restart
+
+Por ultimo se configura cron para que se ejecuta de manera 
+periodica.
+Se abre el fichero /etc/crontab y se añade:
+MAILTO=/dev/null ->Para que no envie emails
+HOME=/ para definir la ruta base
+*/2 * * * root /home/user/practica6.sh >> /dev/null 
+para que se ejecute preiodicamente cada 2 minutos.
+Reiniciamos cron: service cron restart
+
+Para que no solicite todo el rato la contraseña del ssh, en la maquina
+local, se escribe:
+ssh-keygen -b 4096 -t rsa
+Enter hasta que termine
+ssh-copy-id user@192.168.56.3
+
+-------------------------------------
+	     Parte 2
+-------------------------------------
+
+Se instala logcheck: sudo apt-get install logcheck
+Se edita /etc/logcheck/logcheck.conf y cambiar en la linea SENDMAILTO
+por "root"
+En /etc/logcheck/logcheck.logfiles se añade la linea /var/log/monitorizacion.log
+
+Para que muestre solo lo que nosotros queramos, en el fichero:
+/etc/logcheck/ignore.d.server/local
+Se pone las expresiones sobre los datos que queremos ignorar y que no
+envie correo. Por ejemplo, si queremos que solo nos avise si la cuota de 
+memoria usada ha superado 3 GB
+
+Mem:	[0-9]+,[0-9]+G	[0-2]+,[0-9]+G
+
+Si la memoria usada es de 3 GB a mas, nos enviara un correo.
